@@ -11,7 +11,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import azure.functions as func
 
 # --- Loading model files ---
-(reco_als, sparse_matrix, article_lookup) = joblib.load(pathlib.Path('data','collaborative_recommender.pkl'))
+(reco_als, sparse_matrix, article_lookup, user_lookup) = joblib.load(pathlib.Path('data','collaborative_recommender.pkl'))
 (article_embedding, data_train) = joblib.load(pathlib.Path('data','content_based_recommender.pkl'))
 
 #file = open(pathlib.Path('data','articles_embeddings.pickle'),"rb")
@@ -22,7 +22,8 @@ import azure.functions as func
 
 def get_collaborative_recommendations( user_id, reco_size ):
     
-    codes, scores = reco_als.recommend(user_id, sparse_matrix[user_id], N=reco_size, filter_already_liked_items=True)
+    user_codes = lookup_users(user_id)
+    codes, scores = reco_als.recommend(user_codes, sparse_matrix[user_codes], N=reco_size, filter_already_liked_items=True)
     recommendations = pd.DataFrame(np.vstack((codes, scores)).T, columns=['article_id', 'score'])
     recommendations['article_id'] = recommendations['article_id'].apply(lambda x: lookup_articles(x))
     return recommendations
@@ -77,6 +78,12 @@ def lookup_articles( x ):
         return article_lookup['article_id'][x]
     except Exception:
         return -1
+    
+def lookup_users(x):
+    try:
+        return user_lookup['user_id'][x]
+    except Exception:
+        return -1
 
 
 # --- Run Azure MAIN function ---
@@ -88,18 +95,22 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     if not user_id:
         try:
             req_body = req.get_json()
+            user_id = req_body.get('user_id')
         except ValueError:
             pass
-        else:
-            user_id = req_body.get('user_id')
+            
+    reco_size = req.params.get('reco_size')
+    if not reco_size:
+        try:
+            req_body = req.get_json()
+            reco_size = req_body.get('reco_size')
+        except ValueError:
+            reco_size = 5
 
     if user_id:
-        article_ids = get_reco( user_id, 5 )
-        # codes, scores = reco_als.recommend(user_id, sparse_matrix[user_id], N=5, filter_already_liked_items=True)
-        logging.debug(article_ids)
-        return func.HttpResponse(f"{article_ids}")
-        # return json.dumps(codes)
-        # return func.HttpResponse(f"The targetted used_id is {user_id}. This HTTP triggered function executed successfully.")
+        article_ids = get_reco( int(user_id), int(reco_size) )
+        str_articles = ", ".join([str(x) for x in article_ids])
+        return func.HttpResponse(str_articles)
     else:
         return func.HttpResponse(
              "This HTTP triggered function executed successfully. Pass a user_id in the query string or in the request body for a personalized response.",
