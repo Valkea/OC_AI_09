@@ -5,4 +5,6 @@
 azure-functions
 joblib
 implicit
-
+pandas
+numpy
+sklearn
