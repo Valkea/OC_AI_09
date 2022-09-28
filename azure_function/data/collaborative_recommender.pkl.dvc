@@ -1,0 +1,4 @@
+outs:
+- md5: 7f26002bff9457350b6402ee4ea71a33
+  size: 64488831
+  path: collaborative_recommender.pkl
