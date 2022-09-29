@@ -4,6 +4,24 @@
 [This project is part of the AI Engineer class on OpenClassrooms]
 
 
+We are provided with a [dataset](https://www.kaggle.com/gspmoreira/news-portal-user-interactions-by-globocom#clicks_sample.csv) from globo.com containing **364,047 article's metadatas** and **2,988,181 user's interactions with these articles**.
+
+>#### The purpose of this project is to train on various aspects of the recommender systems:
+> - **Collaborative filtering**
+> - **Content Based filtering**
+> - **Hybrid filtering**
+> - **Serverless deployment** *(Azure function)*
+
+<img src='medias/collaborative_vs_content_filtering.png' width=700>
+
+1. At first, we will **conduce an EDA** *(01_EDA.ipynb)* in order to better understand the dataset and prepare some pre-processed datasets.
+2. Then we will search for a **baseline model**. *(02_Recommender_systems.ipynb)*
+3. After that, we will **try various appoaches** of either the Collaborative and Content-based filtering. *(02_Recommender_systems.ipynb)*
+4. Next, we will **build an Hybrid model** based on the best Collaborative and Content-based models. *(02_Recommender_systems.ipynb)*
+5. And, we will develop and **deploy an Azure Function** to expose the hybrid model. *(02_Recommender_systems.ipynb)*
+5. Finally, we **create a Streamlit app** to test the model. *(03_Streamlit.py)*
+
+
 ---
 
 
@@ -12,7 +30,7 @@
 As the notebooks are sometimes too big to be displayed on GitHub (and because the hyperlinks used for the navigation, doesn't work on GitHub), note that they are also avaible on [nbviewer.org](https://nbviewer.org/github/Valkea/OC_AI_09/tree/main/) and [dagshub.com](https://dagshub.com/Valkea/OC_AI_09) for convenience.
 
 
-## Running the notebooks locally
+## Setting up the project / Running the notebooks locally
 
 In order to use this project locally, you will need to have Python and Jupyter notebook installed.
 Once done, we can set the environment by using the following commands:
@@ -85,7 +103,9 @@ So once the notebooks are opened (see below), prior to running it, follow this s
 
 
 ## Running the API server locally 
-The hybrid model is deployed using Azure functions, but if I didn't shared the FUNCTION_KEY with you, you can still start a local instance of the very same Azure function with the following steps:
+The hybrid recommender system is deployed using an `Azure function`, and if I shared the *secrets.txt* file containing the FUNCTION_KEY with you, you can simply jumb to the Streamlit test.
+
+However, in case I didn't shared the secrets.txt with you, you can still start a local instance of the very same Azure function with the following steps:
 
 > #### 1. Install the [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) and [Azure CORE](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=v4%2Clinux%2Ccsharp%2Cportal%2Cbash#v2)
 
@@ -115,14 +135,19 @@ The hybrid model is deployed using Azure functions, but if I didn't shared the F
 > (venv9azure) >>> func host start --port 5000
 > ```
 
-#### Tests
+Stop the Azure function local server, with CTRL+C *(once the tests are done, from another terminal...)*
+
+
+## Testing the model with a Streamlit app
 Once you have access to the Azure function *(either locally or in the cloud with the secret key)*, you can test some recommendations using the Streamlit user interface *(from another terminal if you are already running the local Azure function server)*:
 
 ```bash
 >>> streamlit run 03_Streamlit.py
 ```
 
-Stop with CTRL+C *(once the tests are done, from another terminal...)*
+Set the number of recommendations you want to receive, then click the button next to a user_id to get recommendations *(only a tiny fraction of all users are displayed)*.
+
+Stop the Streamlit server, with CTRL+C *(once the tests are done)*
 
 
 ## Cloud deployement
@@ -147,8 +172,8 @@ I used Azure Function to deploy this project in the cloud. So let's recall the d
 
 > #### 4. Create a virtual environment & install libs
 > ```bash
-> >>> python -m venv MY_VENV
-> >>> source MY_VEN/bin/activate
+> >>> python -m venv VENV_NAME
+> >>> source VENV_NAME/bin/activate
 > >>> pip install -r requirements.txt
 > ```
 
@@ -167,8 +192,12 @@ I used Azure Function to deploy this project in the cloud. So let's recall the d
 > >>> func azure functionapp publish APP_NAME --build remote
 > ```
 
-> #### 8. Grab the function URL on top right of the *function page* for remote calls
+> #### 8. Grab the function URL on top right of the *function page* for remote calls *(Postman, cURL, Streamlit app...)
 
+In this project I used the following parameters:
+* FOLDER_NAME: azure_function
+* VENV_NAME: venvP9azure
+* APP_NAME: globo-reco
 
 ## Uninstalling the venv kernel
 Once done with the project, the kernel can be listed and removed using the following commands:
