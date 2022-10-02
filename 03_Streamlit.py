@@ -4,11 +4,13 @@ import pandas as pd
 import pathlib
 
 # IMPORT Azure Function Key
-with open("secrets.txt") as f:
-    FUNCTION_KEY = f.readline().strip()
+try:
+    with open("secrets.txt") as f:
+        FUNCTION_KEY = f.readline().strip()
+    azure_function_url = f"https://globo-reco.azurewebsites.net/api/HttpTrigger?code={FUNCTION_KEY}"
+except FileNotFoundError:
+    azure_function_url = "http://localhost:5000/api/HttpTrigger?"
 
-azure_function_url = f"https://globo-reco.azurewebsites.net/api/HttpTrigger?code={FUNCTION_KEY}"
-# azure_function_url = "http://localhost:5000/api/HttpTrigger?"
 
 data_train = pd.read_csv(pathlib.Path('data', 'data_train.csv'))
 
