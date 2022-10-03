@@ -139,10 +139,10 @@ Stop the Azure function local server, with CTRL+C *(once the tests are done, fro
 
 
 ## Testing the model with a Streamlit app
-Once you have access to the Azure function *(either locally or in the cloud with the secret key)*, you can test some recommendations using the Streamlit user interface *(from another terminal if you are already running the local Azure function server)*:
+Once you have access to the Azure function *(either locally or in the cloud with the secret key)*, you can test some recommendations using the Streamlit user interface *(from another terminal if you are already running the local Azure function server, and with the `venv9` virtual environment)*:
 
 ```bash
->>> streamlit run 03_Streamlit.py
+(venv9) >>> streamlit run 03_Streamlit.py
 ```
 
 Set the number of recommendations you want to receive, then click the button next to a user_id to get recommendations *(only a tiny fraction of all users are displayed)*.
